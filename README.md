@@ -1,44 +1,21 @@
 # Go Noto Universal
 
+## Why this
+
+https://github.com/notofonts/noto-fonts/issues/13
+
 Noto Fonts go universal! Did you ever want "one font for all languages"? Download pan-Unicode, [Noto
 Fonts](https://github.com/googlefonts/noto-fonts) merged according to the time of usage (current,
 ancient) or geographical region (Africa-MiddleEast, Europe-Americas, South Asia, SE Asia).
 
-We offer two types of combined fonts:
-
-1. Time-based:  
-   - **GoNotoKurrent** covers pretty much all the scripts in current, widespread use all over the
-     world. This is designed to be a "good enough" font for modern, living scripts without being
-     exhaustive.
-   - **GoNotoAncient** covers all the historical, obsolete and liturgical scripts.
-2. Region-based:  
-   Choose a single font based on where you live or whichever region you're interested in:
-   Africa - Middle East, East Asia, Europe - Americas, South Asia or South East Asia.
-
 See [caveats](#caveats) too.
-
-## Download
-
-If you simply want to _use_ the fonts, go to [Releases page](https://github.com/satbyy/go-noto-universal/releases/)
-and download what you need. If you're unsure what to download, you probably need
-GoNotoKurrent-Regular.ttf[^1]. If you want better support for emoji and symbols, try
-GoNotoCurrent-Regular.ttf. A **bold** variant of the font is also available (-Bold.ttf).
-
-Development builds are available from [GitHub
-Actions](https://github.com/satbyy/go-noto-universal/actions) page. Click on any workflow with green
-checkmark ✅ (pipeline passed) and under "Artifacts", download "GoNotoTemporalFonts.zip" and
-"GoNotoRegionalFonts.zip" (login required).
-
-> **_NOTE:_** Even if there are no regular commits to this repo, the CI pipeline builds new Go Noto
-> fonts everyday, pulling the latest Noto Fonts from upstream (using a scheduled cron). So, download
-> the "Artifacts" from the "Actions" page to get the best features and bug fixes from Noto Fonts.
 
 ## Build
 
 If you want to _build_ the fonts yourself, create a virtual environment (venv) and run the script
 you want:
 
-```
+```bash
 python3 -m venv venv_fonty
 source venv_fonty/bin/activate
 ./temporal_fonts.sh  # generates GoNotoAncient.ttf and GoNotoCurrent.ttf
@@ -57,12 +34,10 @@ Latest CI status:
 
 [![Temporal fonts](https://github.com/satbyy/go-noto-universal/actions/workflows/temporal_fonts.yml/badge.svg)](https://github.com/satbyy/go-noto-universal/actions/workflows/temporal_fonts.yml)
 
-
 ## Dependencies
 
 [`fonttools`](https://github.com/fonttools/fonttools/) is automatically fetched and used. The main
 programs we use are `pyftmerge`, `pyftsubset` and `ttx`.
-
 
 ## Coverage
 
@@ -86,72 +61,6 @@ Serif variants of these are also included but their Unicode coverage is not as g
 
 The exact fonts which are combined are too long to list here but can be seen from the source code.
 
-### Regional Fonts
-
-These fonts are merged/combined as per the regions defined in the [Unicode Standard
-(pdf)](https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf). Chapter numbers
-below refer to that spec.
-
-| Go Noto font               | Coverage                                                                                 |
-|----------------------------|------------------------------------------------------------------------------------------|
-| GoNotoEuropeAmericas.ttf   | "Europe" - ch. 7, 8, "Americas" - ch 20, "Notational Systems" - ch 21                    |
-| GoNotoAfricaMiddleEast.ttf | "Middle East" - ch. 9, 10, 11 and "Africa" - ch. 19                                      |
-| GoNotoSouthAsia.ttf        | "South and Central Asia" - ch. 12 and 13                                                 |
-| GoNotoAsiaHistorical.ttf   | "South and Central Asia" - ch. 14 and 15                                                 |
-| GoNotoSouthEastAsia.ttf    | "Southeast Asia" - ch. 16 and "Indonesia and the Philippines" - ch 17                    |
-| GoNotoCJKCore.ttf          | [UnihanCore2020][3] subset of CJK (~20K ideographs). Use [Noto CJK][2] for full coverage |
-| GoNotoEastAsia.ttf         | "East Asia" - ch 18. everything other than Han (CJK)                                     |
-
-Each of the above fonts includes LGC (Latin-Greek-Cyrillic) as default, same coverage as `Noto Sans
-Regular`. Each one also includes Noto Sans Math, Noto Music, Noto Sans Symbols and Noto Sans Symbols
-2 to give you bonus coverage of beautiful notations, symbols and emoji :)
-
-### Go Noto South Asia
-
-Following are included: Bengali, Chakma, Devanagari (Hindi, Marathi, Nepali, etc), Gondi, Gujarati,
-Gunjala Gondi, Gurmukhi, Kannada, Lepcha, Limbu, Malayalam, Masaram Gondi, Meetei Mayek, Mro,
-Nag Mundari, Newa, Ol Chiki, Oriya, Punjabi (Gurmukhi), Saurashtra, Sinhala, Tamil, Tangsa, Telugu,
-Thaana, Tibetan, Toto, Wancho, Warang Citi.
-
-Urdu (Noto Naskh Arabic), though not written in an Indic script and not part of "South Asia"
-chapters in the Unicode spec, is included for practical reasons. Noto Nastaliq Urdu would be more
-appropriate but it is too big to fit in the merged font.
-
-### Go Noto Asia Historical
-
-Following are included: Ahom, Bhaiksuki, Brahmi, Dives Akuru, Dogra, Grantha, Indic Siyaq Numbers,
-Kaithi, Kharoshthi, Khojki, Khudawadi, Mahajani, Makasar, Modi, Multani, Nag Mundari, Nandinagari,
-Old Sogdian, Old Turkic, Old Uyghur, Ottoman Siyaq Numbers, Phags-Pa, Sharada, Siddham, Sogdian,
-Sora Sompeng, Soyombo, Syloti Nagri, Takri, Tirhuta, Zanabazar Square.
-
-### Go Noto South East Asia
-
-Following are included: Balinese, Batak, Buginese, Buhid, Cham, Hanifi Rohingya, Hanunóo, Javanese,
-Kayah Li, Kawi, Khmer, Lao, Makasar, Myanmar, New Tai Lue, Nyiakeng Puache Hmong, Pahawh Hmong, Pau
-Cin Hau, Rejang, Sundanese, Tagalog, Tagbanwa, Tai Le, Tai Tham, Tai Viet, Thai.
-
-### Go Noto Europe Americas
-
-Everything covered by NotoSans (Latin-Greek-Cyrillic etc.) plus Anatolian Hieroglyphics, Armenian,
-Braille, Canadian Aboriginal, Carian, Caucasian Albanian, Cherokee, Coptic, Cypriot, Deseret,
-Duployan, Elbasan, Georgian, Glagolitic, Gothic, Linear A, Linear B, Lycian, Lydian, Mayan Numerals,
-Nyiakeng Puachue Hmong, Ogham, Old Hungarian, Old Italic, Old Permic, Osage, Runic, Shavian, Sutton
-Sign Writing, Vithkuqi.
-
-### Go Noto Africa Middle East
-
-The following are included: Adlam, Anatolian Hieroglyphics, Arabic (Naskh-style), Avestan, Bamum,
-Bassa Vah, Chorasmian, Cuneiform, Egyptian, Elymaic, Ethiopic, Hatran, Hebrew, Imperial Aramaic,
-Inscriptional Pahlavi, Inscriptional Parthian, Mandaic, Manichaean, Medefaidrin, Mende Kikakui,
-Meroitic, Nabataean, N'Ko, Old North Arabian, Old Persian, Old South Arabian, Osmanya, Palmyrene,
-Phoenician, Psalter Pahlavi, Samaritan, Sumero-Akkadian, Syriac, Tifinagh, Ugaritic, Vai, Yezidi.
-
-### Go Noto East Asia
-
-Bopomofo, Hangul, Hiragana and Katakana, Khitan Small Script, Lisu, Marchen, Miao, Mongolian,
-Nüshu, Tangut, Tibetan, Yi, etc. excluding Han/CJK (Chinese-Japanese-Korean). Vertical text
-writing is not supported.
-
 ### Go Noto CJK Core
 
 [Unihan IICore][1] is a minimal, region-agnostic subset of Han/CJK specified in 2005 for
@@ -172,7 +81,6 @@ anymore for glyphs additions.
 
 The only limitation is that Go Noto CJK Core does not support vertical text writing.
 
-
 ## Font Statistics
 
 Font statistics are collected in tsv format (tab separated value) by the CI pipeline in every run
@@ -191,8 +99,6 @@ Statistics below correspond to release v5.1.
 | GoNotoSouthEastAsia.ttf    |            112 |      10813 |  15044 |
 | GoNotoEastAsia.ttf         |            109 |      18710 |  24525 |
 | GoNotoCJKCore.ttf          |            107 |      41132 |  61658 |
-
-NotoSansSignWriting alone contributes about 37900 glyphs to GoNotoEuropeAmericas.ttf.
 
 Note that each of the above include statistics of:
 
@@ -233,6 +139,11 @@ Version 1.1, as required by the upstream Noto Fonts Project.
 
 ### Others
 
+Find font files and related known issues at
+
+- [https://notofonts.github.io/](https://notofonts.github.io/)
+- [https://github.com/notofonts/noto-cjk](https://github.com/notofonts/noto-cjk)
+
 FontTools package comes with nice utilities `ttx` (ttf to xml and back), `pyftsubset` (create font
 with subset of given font) and `pyftmerge` (merging fonts, the workhorse of this repo).
 
@@ -244,6 +155,3 @@ rendered characters.
 [1]: https://wikipedia.org/wiki/International_Ideographs_Core
 [2]: https://github.com/googlefonts/noto-cjk/
 [3]: https://unicode.org/charts/unihan.html
-
-[^1]: The "K" in "Kurrent" stands for full Korean support, but lacks emoji and symbols. Conversely,
- "Go Noto Current" has poor Korean support but includes emojis and symbols.

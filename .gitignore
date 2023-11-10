@@ -5,3 +5,4 @@ venv*/
 *.pickle
 *.ttf
 *.otf
+.python-version

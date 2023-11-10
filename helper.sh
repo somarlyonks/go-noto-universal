@@ -53,25 +53,6 @@ eof
     rm -f stats.py
 }
 
-# cannot merge with 'vmtx' and 'vhea' tables.
-drop_vertical_tables() {
-    local fontname="$1"
-    local output_font="${fontname/-/Subset-}"
-    local dirname="${fontname/-*/}"
-
-    cd cache/
-
-    if [[ ! -e "$output_font" ]]; then
-        download_url "${font_urls[$fontname]}"
-        echo "Removing vertical tables from $fontname"
-        "$VIRTUAL_ENV"/bin/pyftsubset --recommended-glyphs --passthrough-tables \
-                      --glyphs='*' --unicodes='*' --glyph-names --layout-features='*' \
-                      --drop-tables+=vhea,vmtx "$fontname" --output-file="$output_font"
-    fi
-
-    cd "$OLDPWD"
-}
-
 # create Duployan subset so that GSUB is not overflow'ed.
 create_duployan_subset() {
     local input_font=NotoSansDuployan-Regular.ttf
@@ -163,80 +144,6 @@ create_math_subset() {
     cd "$OLDPWD"
 }
 
-# Unihan IICore 2005 is a small subset of CJK (~10k codepoints).
-# Recently it has been superseded by UnihanCore2020, which is double in size.
-create_cjk_unihan_core() {
-    local input_font=NotoSansCJKsc-Regular.otf
-    local subset_otf=GoNotoSansCJKscSubset-Regular.otf
-    local subset_ttf="${subset_otf/otf/ttf}"
-    local output_font=GoNotoCJKCore.ttf
-    local subset_codepoints=unihan_core_2020.txt
-    local codepoints=""
-
-    codepoints+="U+2500-257F,"   # Box drawing
-    codepoints+="U+2E80-2EFF,"   # CJK radicals supplement
-    codepoints+="U+2F00-2FD5,"   # Kangxi radicals
-    codepoints+="U+2FF0-2FFF,"   # Ideographic description characters
-    codepoints+="U+3000-303F,"   # CJK symbols and punctuation
-    codepoints+="U+3100-312F,"   # Bopomofo
-    codepoints+="U+3190-319F,"   # Kanbun
-    codepoints+="U+31A0-31BF,"   # Bopomofo extended
-    codepoints+="U+31C0-31EF,"   # CJK strokes
-    codepoints+="U+FE30-FE4F,"   # CJK compatibility forms, used with vertical writing
-    codepoints+="U+1100-11FF,"   # Hangul jamo
-    codepoints+="U+3130-318F,"   # Hangul compatibility jamo
-    codepoints+="U+3040-309F,"   # Hiragana
-    codepoints+="U+30A0-30FF,"   # Katakana
-    codepoints+="U+31F0-31FF,"   # Katakana phonetic extensions
-    codepoints+="U+3200-32FF,"   # Enclosed CJK letters and months
-    codepoints+="U+3300-33FF,"   # CJK Compatibility
-    codepoints+="U+A960-A97F,"   # Hangul jamo extended-A
-    codepoints+="U+AC00-D7AF,"   # Hangul syllables
-    codepoints+="U+D7B0-D7FF,"   # Hangul jamo extended-B
-    codepoints+="U+F900-FAFF,"   # CJK compatibility ideographs
-    codepoints+="U+FF00-FFEF,"   # Halfwidth and fullwidth forms
-    codepoints+="U+1F200-1F2FF," # Enclosed ideographic supplement
-
-    if [[ -e "$output_font" ]]; then
-        echo "Not overwriting existing font $output_font."
-        return
-    fi
-
-    cd cache/
-
-    download_url "https://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip"
-    python3 -m zipfile -e Unihan.zip .
-    grep kIICore Unihan_IRGSources.txt | cut -f1 > "$subset_codepoints"
-    grep kUnihanCore2020 Unihan_DictionaryLikeData.txt | cut -f1 >> "$subset_codepoints"
-
-    # Choose U+4e00 to U+6000 to avoid cmap format 4 subtable overflow
-    # (reduce number of segments)
-    for code in $(seq 0x4e00 0x6000); do
-        printf "U+%X\n" "$code"
-    done >> "$subset_codepoints"
-
-    sort --unique --output="$subset_codepoints" "$subset_codepoints"
-    download_url "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/$input_font"
-
-    echo "Generating font $subset_otf. Current time: $(date)."
-    "$VIRTUAL_ENV"/bin/pyftsubset "$input_font" \
-                  --unicodes-file="$subset_codepoints" --unicodes="$codepoints" \
-                  --recommended-glyphs --passthrough-tables --glyph-names \
-                  --layout-features='*' --output-file="$subset_otf"
-
-    # convert otf to ttf
-    echo "Generating font $subset_ttf. Current time: $(date)."
-    download_url https://github.com/fonttools/fonttools/raw/main/Snippets/otf2ttf.py
-    python3 ./otf2ttf.py --post-format 2 -o "$subset_ttf" "$subset_otf"
-
-    cd "$OLDPWD"
-
-    go_build "$output_font" \
-             NotoSans-Regular.ttf "$subset_ttf" NotoMusic-Regular.ttf \
-             NotoSansSymbols-Regular.ttf NotoSansSymbols2-Regular.ttf \
-             NotoSansMathSubset-Regular.ttf
-}
-
 _create_cjk_subset() {
     local input_otf=$1
     local subset_otf="${input_otf/-/Subset-}"
@@ -244,8 +151,8 @@ _create_cjk_subset() {
     local codepoints=""
     local features=""
 
-#    codepoints+="U+2E80-2EFF,"   # CJK radicals supplement
-#    codepoints+="U+2F00-2FD5,"   # Kangxi radicals
+    # codepoints+="U+2E80-2EFF,"   # CJK radicals supplement
+    # codepoints+="U+2F00-2FD5,"   # Kangxi radicals
     codepoints+="U+3000-303F,"   # CJK symbols and punctuation
     codepoints+="U+3100-312F,"   # Bopomofo
     codepoints+="U+31A0-31BF,"   # Bopomofo extended
@@ -392,57 +299,6 @@ _create_japanese_kana_subset() {
 create_japanese_kana_subset() {
     _create_japanese_kana_subset NotoSansCJKjp-Regular.otf
     _create_japanese_kana_subset NotoSansCJKjp-Bold.otf
-}
-
-_create_go_noto_current_with_full_korean() {
-    local weight="$1"
-    local input=("${@:2}")  # list of fonts
-
-    # Exclude these fonts, so as to make space for Korean
-    local no_syms=("${input[@]}")
-    no_syms=("${no_syms[@]/NotoSansSymbols-Regular.ttf/}")
-    no_syms=("${no_syms[@]/NotoSansSymbols-Bold.ttf/}")
-    no_syms=("${no_syms[@]/NotoSansSymbols2-Regular.ttf/}")
-    no_syms=("${no_syms[@]/NotoSansMathSubset-Regular.ttf/}")
-    no_syms=("${no_syms[@]/NotoMusic-Regular.ttf/}")
-
-    # Replace Korean "Subset" with "Full" variant
-    no_syms=("${no_syms[@]/NotoSansCJKkrSubset/NotoSansCJKkrFull}")
-
-    # remove null strings (i.e. '') generaged after find-replace
-    no_syms=($(echo "${no_syms[@]}" | grep -o '[^[:space:]]\+'))
-
-    # -a is array, -g is global variable
-    if [[ "$weight" == "Regular" ]]; then
-       declare -ag GoNotoKurrentRegular=("${no_syms[@]}")
-    else
-       declare -ag GoNotoKurrentBold=("${no_syms[@]}")
-    fi
-}
-
-create_go_noto_current_with_full_korean() {
-  _create_go_noto_current_with_full_korean Regular "${GoNotoCurrentRegular[@]}"
-  _create_go_noto_current_with_full_korean Bold "${GoNotoCurrentBold[@]}"
-}
-
-# Indosphere combines South Asia, S.E.Asia and Asia-Historical
-create_indosphere_subset() {
-    declare -ag GoNotoIndosphere # -a is array, -g is global variable
-
-    GoNotoIndosphere=("${GoNotoSouthAsia[@]}")
-
-    # Exclude fonts which are already included above (avoid duplicates)
-    local sea=("${GoNotoSouthEastAsia[@]}")
-    sea=("${sea[@]/NotoSans-Regular.ttf/}")
-    sea=("${sea[@]/NotoSansSymbols-Regular.ttf/}")
-    sea=("${sea[@]/NotoSansSymbols2-Regular.ttf/}")
-    sea=("${sea[@]/NotoSansMathSubset-Regular.ttf/}")
-    sea=("${sea[@]/NotoMusic-Regular.ttf/}")
-
-    # remove null strings (i.e. '') generaged after find-replace
-    sea=($(echo "${sea[@]}" | grep -o '[^[:space:]]\+'))
-
-    GoNotoIndosphere+=("${sea[@]}")
 }
 
 go_build() {

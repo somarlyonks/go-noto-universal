@@ -20,35 +20,15 @@ create_japanese_kana_subset
 create_korean_hangul_subset
 create_math_subset
 create_tibetan_subset
-create_go_noto_current_with_full_korean
 
-drop_vertical_tables NotoSansMongolian-Regular.ttf
-drop_vertical_tables NotoSansNushu-Regular.ttf
-drop_vertical_tables NotoTraditionalNushu-Bold.ttf
+echo "Generating NotoSans-Regular.ttf. Current time: $(date)."
+go_build NotoSans-Regular.ttf "${GoNotoCurrentRegular[@]}"
 
-echo "Generating GoNotoCurrent-Regular.ttf. Current time: $(date)."
-go_build GoNotoCurrent-Regular.ttf "${GoNotoCurrentRegular[@]}"
+echo "Generating NotoSans-Bold.ttf. Current time: $(date)."
+go_build NotoSans-Bold.ttf "${GoNotoCurrentBold[@]}"
 
-echo "Generating GoNotoCurrent-Bold.ttf. Current time: $(date)."
-go_build GoNotoCurrent-Bold.ttf "${GoNotoCurrentBold[@]}"
+echo "Generating NotoSans-Italic.ttf. Current time: $(date)."
+go_build NotoSans-Italic.ttf "${GoNotoCurrentItalic[@]}"
 
-echo "Generating GoNotoKurrent-Regular.ttf. Current time: $(date)."
-go_build GoNotoKurrent-Regular.ttf "${GoNotoKurrentRegular[@]}"
-
-echo "Generating GoNotoKurrent-Bold.ttf. Current time: $(date)."
-go_build GoNotoKurrent-Bold.ttf "${GoNotoKurrentBold[@]}"
-
-# GoNotoAncient.ttf
-drop_vertical_tables NotoSerifDogra-Regular.ttf
-drop_vertical_tables NotoSansNandinagari-Regular.ttf
-drop_vertical_tables NotoSerifTangut-Regular.ttf
-echo "Generating GoNotoAncient.ttf. Current time: $(date)."
-go_build GoNotoAncient.ttf "${GoNotoAncient[@]}"
-
-# GoNotoCurrentSerif.ttf
-echo "Generating GoNotoCurrentSerif.ttf. Current time: $(date)."
-go_build GoNotoCurrentSerif.ttf "${GoNotoCurrentSerif[@]}"
-
-# GoNotoAncientSerif.ttf
-echo "Generating GoNotoAncientSerif.ttf. Current time: $(date)."
-go_build GoNotoAncientSerif.ttf "${GoNotoAncientSerif[@]}"
+echo "Generating Noto-BoldItalic.ttf. Current time: $(date)."
+go_build NotoSans-BoldItalic.ttf "${GoNotoCurrentBoldItalic[@]}"
